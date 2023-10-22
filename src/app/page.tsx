@@ -1,95 +1,60 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+/* eslint-disable react-hooks/exhaustive-deps */
+'use client'
 
-export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+import { OrbitControls } from '@react-three/drei'
+import { Canvas, ThreeEvent } from "@react-three/fiber"
+import { useRef } from 'react'
+import { BoxGeometry, MeshBasicMaterial } from "three"
+import { OrbitControls as ThreeOrbitControls } from 'three-stdlib';
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+const geometryRef = new BoxGeometry(1.0, 1.0, 1.0)
+const materialRef = new MeshBasicMaterial({ color: 'red'})
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+const Cube = () => {
+	const controls = useRef<ThreeOrbitControls>(null);
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+	const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
+			if(controls.current){
+				console.log('disable')
+				controls.current.enableRotate = false
+				setTimeout(() => {
+					if(controls.current){
+						console.log('enable')
+						controls.current.enableRotate = true
+					} 
+				}, 500)
+			}
+	}
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+	const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
+    if(controls.current?.enableRotate){
+      console.log('handlePointerUpg')
+    }
+	}
+
+	return (
+		<>
+			<OrbitControls ref={controls}/>
+			<mesh
+				geometry={geometryRef}
+				material={materialRef}
+				onPointerUp={handlePointerUp}
+				onPointerDown={handlePointerDown}
+			/>
+		</>
+	)
 }
+
+const Cubes = () => { 
+	const canvas = useRef<HTMLCanvasElement>(null)
+	return (
+		<div style={{width: '500px', height: '500px'}}>
+			<Canvas ref={canvas} >
+				<Cube />
+			</Canvas>
+		</div>
+	)
+};
+
+export default Cubes
